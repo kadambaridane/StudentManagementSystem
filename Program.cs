@@ -21,6 +21,17 @@ builder.Host.UseSerilog();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
+//  CORS - allow the Angular dev server to call this API
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngularDev", policy =>
+    {
+        policy.WithOrigins("http://localhost:4200")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 //  Swagger + JWT Authorize Button
 builder.Services.AddSwaggerGen(options =>
 {
@@ -93,7 +104,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseAuthentication(); 
+app.UseCors("AllowAngularDev");
+
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
